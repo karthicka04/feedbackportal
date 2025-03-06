@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js"
 
 // Load environment variables
 dotenv.config();
@@ -16,13 +17,13 @@ const app = express();
 connectDB();
 
 // Middleware
+app.use(cors({ origin: "http://localhost:5173", credentials: true })); // Cors should ideally go on top
 app.use(express.json());
-app.use(bodyParser.json());
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/feedback",feedbackRoutes)
 
 // Start Server
 const PORT = process.env.PORT || 5000;

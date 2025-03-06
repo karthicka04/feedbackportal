@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import './Form.css'; 
+import './Form.css';
+
 const Form = () => {
+  const user = JSON.parse(localStorage.getItem("currentUser"));
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // If the user object doesn't exist or _id is missing, redirect to login
+    if (!user || !user._id) {
+      console.warn("User not logged in or invalid user data. Redirecting to login.");
+      window.location.href = '/login';
+      return; // Important: Stop further execution
+    }
+  }, [user]); // Run this effect when the user object changes
+
   const [formData, setFormData] = useState({
     name: '',
     rollNumber: '',
@@ -70,7 +83,7 @@ const Form = () => {
 
   const handleAddQuestion = (roundIndex) => {
     const updatedRounds = [...formData.rounds];
-    updatedRounds[roundIndex].questions.push(''); 
+    updatedRounds[roundIndex].questions.push('');
     setFormData({ ...formData, rounds: updatedRounds });
   };
 
@@ -80,32 +93,66 @@ const Form = () => {
     setFormData({ ...formData, rounds: updatedRounds });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('handleSubmit called');
+    console.log('Form data:', formData);
+
     if (!formData.privacyAgreement) {
       alert('Please accept the privacy agreement to submit.');
       return;
     }
-    console.log('Form Data Submitted:', formData);
-    alert('Thank you for your feedback!');
-    setFormData({
-      name: '',
-      rollNumber: '',
-      department: '',
-      companyName: '',
-      companyLocation: '',
-      role: '',
-      placementType: '',
-      totalRounds: 0,
-      rounds: [],
-      additionalDetails: '',
-      tips: '',
-      month: '',
-      year: '',
-      preparationTime: '',
-      skillsUsed: '',
-      privacyAgreement: false,
-    });
+
+    setIsLoading(true);
+    try {
+      if (!user || !user._id) {
+        console.error("User data is invalid:", user);
+        alert("User data is invalid. Please log in again.");
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/feedback', { // <-- Assuming backend runs on 3001
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          userId: user._id, // Use user._id here!
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Feedback submitted successfully!');
+        alert('Thank you for your feedback!');
+        setFormData({
+          name: '',
+          rollNumber: '',
+          department: '',
+          companyName: '',
+          companyLocation: '',
+          role: '',
+          placementType: '',
+          totalRounds: 0,
+          rounds: [],
+          additionalDetails: '',
+          tips: '',
+          month: '',
+          year: '',
+          preparationTime: '',
+          skillsUsed: '',
+          privacyAgreement: false,
+        });
+      } else {
+        console.error('Failed to submit feedback:', response.status);
+        alert('Failed to submit feedback. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      alert('An error occurred while submitting feedback. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const generateRoundInputs = () => {
@@ -167,7 +214,7 @@ const Form = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="feedback-form">
+    <form onSubmit={handleSubmit} className={'feedback-form'}>
       <h2>Placement Feedback Form</h2>
       <label>
         Name:
@@ -301,8 +348,6 @@ const Form = () => {
       </label>
       {formData.totalRounds > 0 && generateRoundInputs()}
 
-     
-
       <label>
         Skills Used:
         <input
@@ -344,7 +389,9 @@ const Form = () => {
         I agree that my feedback can be shared anonymously for educational purposes.
       </label>
 
-      <button type="submit">Submit Feedback</button>
+      <button type="submit" disabled={isLoading}>
+        {isLoading ? 'Submitting...' : 'Submit Feedback'}
+      </button>
     </form>
   );
 };

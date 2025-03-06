@@ -10,8 +10,9 @@ import placement2023 from "../assets/3-4.png";
 import placement2022 from "../assets/2022-2023.png";
 import placement2021 from "../assets/2021-2022.png";
 import placement2020 from "../assets/2020-2021.png";
+import Form from "./Form";
 const Home = () => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  
    return (
     <div className="container">
         <header className="hero">
@@ -51,7 +52,7 @@ const Home = () => {
           </div>
           <div className="row center-row">
             <img src={placement2020} alt="Placement 2020-2021" className="placement-image" />
-          </div>c
+          </div>
         </div>
       </section>
       <section className="features">
@@ -74,6 +75,7 @@ const Home = () => {
       <footer className="footer">
         <p>&copy; 2025 Placement Feedback Portal. All rights reserved.</p>
       </footer>
+   
     </div>
   );
 };
