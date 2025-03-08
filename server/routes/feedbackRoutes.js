@@ -1,4 +1,4 @@
-// routes/feedback.routes.js
+// server/routes/feedbackRoutes.js
 import express from 'express';
 const router = express.Router();
 import Feedback from '../models/feedback.js';
@@ -76,14 +76,20 @@ router.post('/', validateUserId, async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-    try {
-        const allFeedback = await Feedback.find().populate('userId', 'username email');
-        res.status(200).json(allFeedback);
-    } catch (error) {
-        console.error('Error fetching feedback:', error);
-        res.status(500).json({ error: 'Failed to fetch feedback.', details: error.message });
+  try {
+    const userId = req.query.userId;
+    let query = {}; // Initialize an empty query
+    if (userId) {
+      query = { userId: userId }; // Filter by userId if provided
     }
+    const allFeedback = await Feedback.find(query).populate('userId', 'username email');
+    res.status(200).json(allFeedback);
+  } catch (error) {
+    console.error('Error fetching feedback:', error);
+    res.status(500).json({ error: 'Failed to fetch feedback.', details: error.message });
+  }
 });
+
 
 router.get('/:id', async (req, res) => {
   try{
@@ -100,5 +106,67 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch feedback.', details: error.message });
   }
 })
+
+
+
+router.put('/:id', async (req, res) => {
+    try {
+        const feedbackId = req.params.id;
+        const {
+            name,
+            rollNumber,
+            department,
+            companyName,
+            companyLocation,
+            role,
+            placementType,
+            totalRounds,
+            rounds,
+            additionalDetails,
+            tips,
+            month,
+            year,
+            preparationTime,
+            skillsUsed,
+            privacyAgreement,
+        } = req.body;
+
+        // Find the feedback by ID and update it
+        const updatedFeedback = await Feedback.findByIdAndUpdate(
+            feedbackId,
+            {
+                name,
+                rollNumber,
+                department,
+                companyName,
+                companyLocation,
+                role,
+                placementType,
+                totalRounds,
+                rounds,
+                additionalDetails,
+                tips,
+                month,
+                year,
+                preparationTime,
+                skillsUsed,
+                privacyAgreement,
+            },
+            { new: true, runValidators: true } //  `new: true` to return the updated document and `runValidators: true` to ensure validation during the update.
+        );
+
+        if (!updatedFeedback) {
+            return res.status(404).json({ error: 'Feedback not found' });
+        }
+
+        console.log('Feedback updated successfully:', updatedFeedback);
+        res.status(200).json({ message: 'Feedback updated successfully!', feedback: updatedFeedback });
+
+    } catch (error) {
+        console.error('Error updating feedback:', error);
+        res.status(500).json({ error: 'Failed to update feedback.', details: error.message });
+    }
+});
+
 
 export default router;

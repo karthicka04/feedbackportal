@@ -6,7 +6,8 @@ import Login from "./components/Login";
 import AdminPage from "./components/AdminPage";
 import Navbar from "./compo/Navbar";
 import Form from "./components/Form";
-
+import Profile from './components/Profile';
+import EditFeedback from './components/EditFeedback';
 function App() {
   return (
 
@@ -18,8 +19,8 @@ function App() {
         <Route path="/login" element={<Login/>}/>
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/post" element={<Form/>}/>
-      
-
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/editfeedback/:feedbackId" element={<EditFeedback />} /> 
       </Routes>
     </Router>
   
