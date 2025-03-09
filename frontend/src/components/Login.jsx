@@ -7,14 +7,12 @@ function Login() {
     const[email,setemail]=useState('')
     const[password,setpassword]=useState('')
     const[error,setError]=useState('')
-   
     const [loading,setloading] = useState(false);
    
     async function login()
     {
         
             const user={
-               
                 email,
                 password
                

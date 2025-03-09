@@ -11,7 +11,6 @@ const Navbar = () => {
         localStorage.removeItem('currentUser');
         window.location.href = '/login';
     }
-
     return (
         <div>
             <nav className="navbar">
