@@ -1,29 +1,107 @@
-/* Profile Container */
+/* src/components/Profile.css */
+
+/* Main Profile Container */
 .profile-container {
-  max-width: 600px;
-  margin: 50px auto;
-  padding: 25px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
   background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-  text-align: center;
   font-family: 'Poppins', sans-serif;
-  transition: all 0.3s ease-in-out;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
-.profile-container:hover {
-  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+/* Profile Layout */
+.profile-layout {
+  display: flex;
+  height: 100vh; /* Set height to 100vh (viewport height) */
+}
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: linear-gradient(135deg, #2c7dd4, #003f7f);
+  color: white;
+  padding: 40px 0 40px 20px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Profile Header */
-.profile-header h2 {
-  color: #2c5282;
+/* Sidebar Header */
+.sidebar-header {
   font-size: 28px;
-  margin-bottom: 20px;
-  font-weight: 700;
+  font-weight: bold;
+  padding: 20px;
+  text-align: left;
+  letter-spacing: 1px;
 }
 
-/* Profile Details - Align Avatar & Text Horizontally */
+/* Sidebar List */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Sidebar Items */
+.sidebar li {
+  padding: 14px 22px;
+  margin-bottom: 12px;  /* 👈 Added spacing below each option */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  color: white;
+  display: flex;
+  align-items: center;
+  font-size: 19px;
+  font-weight: 500;
+  position: relative;
+  border-radius: 5px;
+}
+
+/* Hover Effect */
+.sidebar li:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  padding-left: 25px;
+}
+
+/* Active Sidebar Item */
+.sidebar li.active {
+  background-color: white;
+  color: #224481;
+  font-weight: bold;
+  padding-left: 26px;
+  box-shadow: inset 2px 2px 6px rgba(199, 181, 181, 0.08);
+}
+
+/* Active Item Left Indicator */
+.sidebar li.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background-color: #224481;
+  border-radius: 3px;
+}
+
+
+/* Content Area Styles */
+.content-area {
+  flex: 1;
+  padding: 20px;
+  background-color: white; /* Changed from #f8f9fa to white */
+  border-radius: 10px;
+}
+
+.content-area>* {
+  background-color: white;
+  padding: 10px;
+}
+
+/* Remaining Styles (existing) */
 .profile-details {
   display: flex;
   align-items: center;
@@ -35,7 +113,6 @@
   text-align: left;
 }
 
-/* Profile Avatar - Align to Left */
 .profile-avatar {
   width: 60px;
   height: 60px;
@@ -48,14 +125,13 @@
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
-  margin-right: 15px; /* Space between avatar & text */
+  margin-right: 15px;
   min-width: 60px;
 }
 
-/* Profile Text - Align Name & Email in Column */
 .profile-text {
   display: flex;
-  flex-direction: column; /* Stack name and email */
+  flex-direction: column;
   justify-content: center;
 }
 
@@ -63,7 +139,7 @@
   margin: 4px 0;
   font-size: 16px;
   color: #444;
-  overflow-wrap: break-word; /* Handle long names */
+  overflow-wrap: break-word;
 }
 
 .profile-text p span {
@@ -71,7 +147,6 @@
   color: #2c5282;
 }
 
-/* Feedback Section */
 .feedback-section {
   text-align: left;
   background: #ffffff;
@@ -89,7 +164,6 @@
   font-weight: 700;
 }
 
-/* Feedback List */
 .feedback-list {
   list-style: none;
   padding: 0;
@@ -112,7 +186,6 @@
   background: #e2e8f0;
 }
 
-/* Feedback Text */
 .feedback-text {
   display: flex;
   flex-direction: column;
@@ -120,7 +193,7 @@
 
 .company {
   font-weight: 700;
-  color: #2c5282;
+  color: #0056b3;
   font-size: 17px;
 }
 
@@ -130,7 +203,6 @@
   font-size: 15px;
 }
 
-/* Edit Icon */
 .edit-icon {
   font-size: 20px;
   color: #4a90e2;
@@ -142,7 +214,6 @@
   color: #2c5282;
 }
 
-/* No Feedback Message */
 .no-feedback {
   color: #777;
   font-size: 16px;
@@ -151,18 +222,43 @@
 }
 
 /* Responsive Design */
+@media (max-width: 768px) {
+  .profile-layout {
+      flex-direction: column;
+  }
+
+  .sidebar {
+      width: 100%;
+      padding: 10px;
+  }
+
+  .sidebar ul {
+      display: flex;
+      justify-content: space-around;
+  }
+
+  .sidebar li {
+      padding: 8px 10px;
+      text-align: center;
+  }
+
+  .content-area {
+      padding: 10px;
+  }
+}
+
 @media (max-width: 500px) {
   .feedback-section {
-    padding: 20px;
+      padding: 20px;
   }
 
   .feedback-list li {
-    flex-direction: column;
-    align-items: flex-start;
+      flex-direction: column;
+      align-items: flex-start;
   }
 
   .edit-icon {
-    align-self: flex-end;
-    margin-top: 8px;
+      align-self: flex-end;
+      margin-top: 8px;
   }
 }
