@@ -22,24 +22,10 @@ const Navbar = () => {
 
                         {user ? (
                             <>
-                                {/* Dropdown for Roles */}
-                                <li
-                                    className="dropdown"
-                                    onMouseEnter={() => setDropdownOpen(true)}
-                                    onMouseLeave={() => setDropdownOpen(false)}
-                                >
-                                    <a href="#" className="dropdown-toggle" onClick={(e) => e.preventDefault()}>
-                                        Roles ▾
-                                    </a>
-                                    {dropdownOpen && (
-                                        <ul className="dropdown-menu">
-                                            <li><a href="/post">Post Feedback</a></li>
-                                            <li><a href="/view">View Feedback</a></li>
-                                        </ul>
-                                    )}
-                                </li>
+                                
+                                
 
-                                {/* Profile Dropdown */}
+                                
                                 <li className="nav-item dropdown">
                                     <div
                                         className="profile-circle"
@@ -92,7 +78,7 @@ const Navbar = () => {
                 </div>
             </nav>
 
-            {/* Inline styles */}
+           
             <style>
                 {`
                 .profile-circle {

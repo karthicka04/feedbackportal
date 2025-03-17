@@ -1,59 +1,65 @@
-import React,{useState,useEffect} from 'react'
+import React, { useState } from "react";
 import axios from "axios";
-import Loader from "../compo/Loader";
-import Error from "../compo/Error";
-function Login() {
-   
-    const[email,setemail]=useState('')
-    const[password,setpassword]=useState('')
-    const[error,setError]=useState('')
-    const [loading,setloading] = useState(false);
-   
-    async function login()
-    {
-        
-            const user={
-                email,
-                password
-               
-            }
-            try {
-                    setloading(true);
-                    const { data } = await axios.post('http://localhost:5000/api/auth/login',user);
-                    
-                    
-                    setloading(false);
+import { toast } from "react-toastify";
+//import { showErrorToast } from "../compo/Error"; // Ensure this function exists in Error.jsx
 
-                    localStorage.setItem('currentUser',JSON.stringify(data));
-                    window.location.href='/home'
-                   
-                    
-                  } catch (error) {
-                    setloading(false);
-                    setError(true);
-                  }
-           
-       
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function login() {
+    const user = { email, password };
+
+    try {
+      setLoading(true);
+      const { data } = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        user
+      );
+      setLoading(false);
+
+      localStorage.setItem("currentUser", JSON.stringify(data));
+      toast.success("Login Successful!", { position: "top-right", autoClose: 2000 });
+
+      setTimeout(() => {
+        window.location.href = "/home";
+      }, 2000);
+    } catch (error) {
+      setLoading(false);
+     toast.error("Invalid Credentials"); // ✅ Using showErrorToast
     }
+  }
 
   return (
     <div>
-        {loading && (<Loader/>)}
-        <div className="row justify-content-center mt-5">
-            <div className="col-md-5 mt-5">
-                {error && (<Error message='Invalid Credentials'/>)}
-                <div className="bs">
-                    <h2>Login</h2>
-                   
-                    <input type="text" className="form-control" placeholder="email" value={email} onChange={(e)=>{setemail(e.target.value)}}/>
-                    <input type="text" className="form-control" placeholder="password" value={password} onChange={(e)=>{setpassword(e.target.value)}}/>
-                    <button className='btn btn-primary mt-3' onClick={login}>Login</button>
-
-                </div>
-            </div>
+      {loading && <p>Loading...</p>}
+      <div className="row justify-content-center mt-5">
+        <div className="col-md-5 mt-5">
+          <div className="bs">
+            <h2>Login</h2>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              className="form-control"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button className="btn btn-primary mt-3" onClick={login}>
+              Login
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-  )
+  );
 }
 
-export default Login
+export default Login;

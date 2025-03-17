@@ -1,13 +1,7 @@
-import React from 'react'
+// src/compo/Error.jsx
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-function Error({message}) {
-  return (
-    <div>
-        <div class="alert alert-danger" role="alert">
-            {message}
-        </div>
-    </div>
-  )
-}
-
-export default Error
+export const showErrorToast = (message) => {
+  toast.error(message);
+};

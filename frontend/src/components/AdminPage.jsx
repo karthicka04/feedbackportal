@@ -1,126 +1,175 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
-import * as XLSX from "xlsx"; // Import xlsx library
+import * as XLSX from "xlsx";
+import { toast } from "react-toastify";
+import "./AdminPage.css";
 
 const AdminPage = () => {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [excelData, setExcelData] = useState([]); // State to store extracted Excel data
-    const fileInputRef = useRef(null);  // Ref for file input
+  const [activeSection, setActiveSection] = useState("dashboard");
 
-    const handleAddUser = async (e) => {
-        e.preventDefault();
-        setMessage(""); 
+  // User States
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-        try {
-            const response = await axios.post("http://localhost:5000/api/admin/add-user", {
-                name,
-                email,
-                password,
-            });
+ 
+  const [companyName, setCompanyName] = useState("");
+  const [companyLocation, setCompanyLocation] = useState("");
+  const [companyLogo, setCompanyLogo] = useState("");
+  
 
-            setMessage(response.data.message);
-            setName("");
-            setEmail("");
-            setPassword("");
-        } catch (error) {
-            console.error("Error adding user:", error);
-            setMessage(error.response?.data?.message || "Error adding user. Please check your backend.");
-        }
+  // File Upload & Message States
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [excelData, setExcelData] = useState([]);
+  const fileInputRef = useRef(null);
+
+  // **Handle User Addition**
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5000/api/admin/add-user", {
+        name,
+        email,
+        password,
+      });
+      toast.success("User added successfully ✅");
+      setName("");
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      toast.error("Error adding user ❌");
+    }
+  };
+
+  // **Handle Company Addition**
+  const handleAddCompany = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5000/api/admin/add-company", {
+        name: companyName,
+        location: companyLocation,
+        logo: companyLogo,
+      });
+      toast.success("Company added successfully ✅");
+      setCompanyName("");
+      setCompanyLocation("");
+      setCompanyLogo("");
+      
+    } catch (error) {
+      toast.error("Error adding company ❌");
+    }
+  };
+
+  // **Handle Bulk Upload**
+  const handleBulkUpload = async (type) => {
+    if (!selectedFile) {
+      toast.error("Please select a file first ❗");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+  
+    try {
+      await axios.post(`http://localhost:5000/api/admin/bulk-upload/${type}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(`Bulk ${type} upload successful ✅`);
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(`Error uploading ${type} file ❌`);
+    }
+  };
+  // **Handle File Selection**
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      readExcel(file);
+    }
+  };
+
+  // **Read Excel File**
+  const readExcel = (file) => {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const parsedData = XLSX.utils.sheet_to_json(sheet);
+
+      // Validate Data Format
+      if (parsedData.length === 0) {
+        toast.error("Excel file is empty ❌");
+        return;
+      }
+
+      const validData = parsedData.map((row) => ({
+        name: row["Name"] || "",
+        email: row["Email"] || "",
+        password: row["Password"] || "",
+      }));
+
+      setExcelData(validData);
     };
+  };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setSelectedFile(file);
-            readExcel(file);
-        }
-    };
+  return (
+    <div className="admin-container">
+      {/* Sidebar Navigation */}
+      <aside className="sidebar">
+        <button onClick={() => setActiveSection("dashboard")}>Dashboard</button>
+        <button onClick={() => setActiveSection("addUser")}>Add Users</button>
+        <button onClick={() => setActiveSection("addCompany")}>Add Company</button>
+        <button onClick={() => setActiveSection("bulkUpload")}>Bulk Upload</button>
+      </aside>
 
-    const readExcel = (file) => {
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(file);
-        reader.onload = (e) => {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: "array" });
-            const sheetName = workbook.SheetNames[0]; // Read the first sheet
-            const sheet = workbook.Sheets[sheetName];
-            const parsedData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Convert to JSON
-            setExcelData(parsedData);
-        };
-    };
+      {/* Main Content */}
+      <main className="content">
+        {/* Dashboard */}
+        {activeSection === "dashboard" && <h2>Welcome to Admin Dashboard 🎉</h2>}
 
-    return (
-        <div>
-            <h2>Admin Dashboard - Add User</h2>
-            {message && <p>{message}</p>}
+        {/* Add User Section */}
+        {activeSection === "addUser" && (
+          <>
+            <h2>Add User</h2>
             <form onSubmit={handleAddUser}>
-                <input
-                    type="text"
-                    placeholder="User Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
-                <input
-                    type="email"
-                    placeholder="User Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="User Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Add User</button>
+              <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <button type="submit">Add User</button>
             </form>
+          </>
+        )}
 
-            {/* Excel Upload Section */}
-            <div style={{ marginTop: "20px" }}>
-                <button onClick={() => fileInputRef.current.click()}>Upload XL Sheet</button>
-                <input
-                    type="file"
-                    accept=".xls,.xlsx"
-                    ref={fileInputRef}
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                />
-                {selectedFile && <p>Selected File: {selectedFile.name}</p>}
-            </div>
+        {/* Add Company Section */}
+        {activeSection === "addCompany" && (
+          <>
+            <h2>Add Company</h2>
+            <form onSubmit={handleAddCompany}>
+              <input type="text" placeholder="Company Name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+              <input type="text" placeholder="Location" value={companyLocation} onChange={(e) => setCompanyLocation(e.target.value)} required />
+              <input type="text" placeholder="Logo URL" value={companyLogo} onChange={(e) => setCompanyLogo(e.target.value)} required />
+              
+              <button type="submit">Add Company</button>
+            </form>
+          </>
+        )}
 
-            {/* Display Excel Data */}
-            {excelData.length > 0 && (
-                <div style={{ marginTop: "20px" }}>
-                    <h3>Extracted Excel Data</h3>
-                    <table border="1">
-                        <thead>
-                            <tr>
-                                {excelData[0].map((header, index) => (
-                                    <th key={index}>{header}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {excelData.slice(1).map((row, rowIndex) => (
-                                <tr key={rowIndex}>
-                                    {row.map((cell, cellIndex) => (
-                                        <td key={cellIndex}>{cell}</td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-        </div>
-    );
+        {/* Bulk Upload Section */}
+        {activeSection === "bulkUpload" && (
+          <>
+            <h2>Bulk Upload</h2>
+            <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} ref={fileInputRef} />
+            <button onClick={() => handleBulkUpload("user")}>Upload Users</button>
+            <button onClick={() => handleBulkUpload("company")}>Upload Companies</button>
+          </>
+        )}
+      </main>
+    </div>
+  );
 };
 
 export default AdminPage;

@@ -6,11 +6,11 @@ const Form = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // If the user object doesn't exist or _id is missing, redirect to login
+   
     if (!user || !user._id) {
       console.warn("User not logged in or invalid user data. Redirecting to login.");
       window.location.href = '/login';
-      return; // Important: Stop further execution
+      return;
     }
   }, [user]); // Run this effect when the user object changes
 

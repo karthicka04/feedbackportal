@@ -1,13 +1,15 @@
-import React from 'react'
+import React from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-function Success({message}) {
-  return (
-    <div>
-        <div class="alert alert-success" role="alert">
-          {message}
-        </div>
-    </div>
-  )
-}
 
-export default Success
+export const showSuccessToast = (message) => {
+  toast.success(message, {
+    position: "top-right",
+    autoClose: 3000, // Closes after 3 seconds
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
+};
