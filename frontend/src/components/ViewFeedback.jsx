@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { FaHeart, FaRegHeart, FaBookmark, FaRegBookmark, FaFlag } from "react-icons/fa";
 import "./ViewFeedback.css";
 
-const ViewFeedback = () => {
+const ViewFeedback = ({companyId}) => {
     const [feedbacks, setFeedbacks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    // const { companyId } = useParams(); // Get companyId from the URL, No need for this line
     const [likedFeedbacks, setLikedFeedbacks] = useState({});
     const [bookmarkedFeedbacks, setBookmarkedFeedbacks] = useState({});
     const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -23,12 +24,28 @@ const ViewFeedback = () => {
     useEffect(() => {
         const fetchFeedbacks = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/feedback");
-                if (!response.ok) throw new Error("Failed to fetch feedback");
-                
+                if (!companyId) {
+                    setError("Invalid company ID.");
+                    setLoading(false);
+                    return;
+                }
+
+                console.log("Fetching companyId:", companyId); // Debugging log
+
+                const response = await fetch(`http://localhost:5000/api/feedback?companyId=${companyId}`); // Corrected URL
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        navigate("/recruiters"); // Redirect if companyId is invalid
+                        return;
+                    }
+                    throw new Error(`Failed to fetch feedback: ${response.status}`); // More informative error
+                }
+
                 const data = await response.json();
                 setFeedbacks(data);
+                console.log("Fetched feedback data:", data); // Log the data
             } catch (err) {
+                console.error("Error fetching feedback:", err);
                 setError(err.message);
             } finally {
                 setLoading(false);
@@ -36,7 +53,7 @@ const ViewFeedback = () => {
         };
 
         fetchFeedbacks();
-    }, []);
+    }, [companyId, navigate]);
 
     const updateLikeOrSave = async (feedbackId, actionType) => {
         if (!user || !user._id) {
@@ -129,7 +146,7 @@ const ViewFeedback = () => {
                             </button>
                         </div>
 
-                       
+
                         <button
                             onClick={() => navigate(`/feedback/${feedback._id}`)}
                             className="view-feedback-btn"

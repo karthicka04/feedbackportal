@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import './Form.css';
 
-const Form = () => {
+const Form = ({ companyId, initialCompanyName, initialCompanyLocation }) => {
   const user = JSON.parse(localStorage.getItem("currentUser"));
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-   
     if (!user || !user._id) {
       console.warn("User not logged in or invalid user data. Redirecting to login.");
       window.location.href = '/login';
       return;
     }
-  }, [user]); // Run this effect when the user object changes
+  }, [user]);
 
   const [formData, setFormData] = useState({
     name: '',
     rollNumber: '',
     department: '',
-    companyName: '',
-    companyLocation: '',
+    companyName: initialCompanyName || '', // Initialize with props
+    companyLocation: initialCompanyLocation || '', // Initialize with props
     role: '',
     placementType: '',
     totalRounds: 0,
@@ -32,6 +31,14 @@ const Form = () => {
     skillsUsed: '',
     privacyAgreement: false,
   });
+
+  useEffect(() => {
+        setFormData(prevState => ({
+            ...prevState,
+            companyName: initialCompanyName || '',
+            companyLocation: initialCompanyLocation || ''
+        }));
+    }, [initialCompanyName, initialCompanyLocation]);
 
   const roundTypes = [
     'Aptitude',
@@ -111,14 +118,15 @@ const Form = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/feedback', { // <-- Assuming backend runs on 3001
+      const response = await fetch('http://localhost:5000/api/feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...formData,
-          userId: user._id, // Use user._id here!
+          userId: user._id,
+          companyId: companyId, // Include the companyId here!
         }),
       });
 

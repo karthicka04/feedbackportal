@@ -1,0 +1,29 @@
+.company-feedback-page {
+    width: 80%;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    padding: 20px;
+}
+
+.tab-buttons {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.tab-buttons button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #eee;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.tab-buttons button.active {
+    background-color: #ddd;
+    font-weight: bold;
+}
+
+.tab-content {
+    border: 1px solid #eee;
+    padding: 20px;
+}

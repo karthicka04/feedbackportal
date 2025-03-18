@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 const FeedbackDetails = () => {
-  const { id } = useParams();  // Get feedback ID from URL
+  const { id } = useParams(); 
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

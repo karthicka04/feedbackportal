@@ -25,6 +25,7 @@ router.post("/login", async (req, res) => {
                 email: user.email,
                 isAdmin: user.isAdmin,
                 _id: user.id,
+                password:user.password,
             };
             return res.send(temp);
         } else {

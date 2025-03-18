@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; 
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Home from "./components/Home";
 import Login from "./components/Login";
@@ -12,27 +12,28 @@ import ViewFeedback from "./components/ViewFeedback";
 import FeedbackDetails from "./components/FeedbackDetails";
 import { ToastContainer } from "react-toastify";
 import Recruiters from "./components/Recruiter";
-//import "react-toastify/dist/ReactToastify.css";
+import CompanyFeedbackPage from "./components/CompanyFeedbackPage"; // Import the new component
 
 function App() {
-  return (
-    <Router>
-      <Navbar />
-      <ToastContainer closeButton={false}/>  {/* Ensuring ToastContainer is included for notifications */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/post" element={<Form />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/editfeedback/:feedbackId" element={<EditFeedback />} />
-        <Route path="/view" element={<ViewFeedback />} />
-        <Route path="/feedback/:id" element={<FeedbackDetails />} /> 
-        <Route path="/recruiters" element={<Recruiters/>} />
-      </Routes>
-    </Router>
-  );
+    return (
+        <Router>
+            <Navbar />
+            <ToastContainer closeButton={false} />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/admin" element={<AdminPage />} />
+                {/* Remove this: */}
+                {/* <Route path="/post/:companyId" element={<Form />} /> */}
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/editfeedback/:feedbackId" element={<EditFeedback />} />
+                <Route path="/company/:companyId" element={<CompanyFeedbackPage />} /> {/* Update this route */}
+                <Route path="/feedback/:id" element={<FeedbackDetails />} />
+                <Route path="/recruiters" element={<Recruiters />} />
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;

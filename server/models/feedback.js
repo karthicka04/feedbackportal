@@ -1,82 +1,105 @@
-// models/Feedback.js
+import mongoose from "mongoose"; // Using ES6 import
 
-import mongoose from 'mongoose'; // Use import instead of require
-
-const feedbackSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Ensure you have a User model defined
-    required: true
+const feedbackSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", 
+      required: true,
+    },
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company", 
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true, 
+    },
+    rollNumber: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    department: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    companyName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    companyLocation: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    role: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    placementType: {
+      type: String,
+      required: true,
+      enum: ["Internship", "Full-time", "Contract"],
+    },
+    totalRounds: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+    rounds: [
+      {
+        roundName: { type: String, required: true, trim: true },
+        questions: [{ type: String, required: true }],
+      },
+    ],
+    additionalDetails: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    tips: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    month: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    year: {
+      type: Number,
+      required: true,
+      min: 2000, // Optional: Ensures reasonable years
+    },
+    preparationTime: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    skillsUsed: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    privacyAgreement: {
+      type: Boolean,
+      required: true,
+    },
+    likes: { type: Number, default: 0 },
+    savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
-  name: {
-    type: String,
-    required: true
-  },
-  rollNumber: {
-    type: String,
-    required: true
-  },
-  department: {
-    type: String,
-    required: true
-  },
-  companyName: {
-    type: String,
-    required: true
-  },
-  companyLocation: {
-    type: String,
-    required: true
-  },
-  role: {
-    type: String,
-    required: true
-  },
-  placementType: {
-    type: String,
-    required: true
-  },
-  totalRounds: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  rounds: [{
-    roundName: String,
-    questions: [String]
-  }],
-  additionalDetails: {
-    type: String,
-    default: ''  // Important:  Provide a default value
-  },
-  tips: {
-    type: String,
-    default: ''  // Important: Provide a default value
-  },
-  month: {
-    type: String,
-    required: true
-  },
-  year: {
-    type: Number,
-    required: true
-  },
-  preparationTime: {
-    type: String,
-    default: '' // Provide a default value
-  },
-  skillsUsed: {
-    type: String,
-    default: '' // Provide a default value
-  },
-  privacyAgreement: {
-    type: Boolean,
-    required: true
+  {
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
   }
-}, {
-  timestamps: true // Adds createdAt and updatedAt fields automatically.  Highly recommended.
-});
+);
 
-const Feedback = mongoose.model('Feedback', feedbackSchema);
+const Feedback = mongoose.model("Feedback", feedbackSchema);
 
 export default Feedback;
