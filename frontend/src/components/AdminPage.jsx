@@ -7,7 +7,7 @@ import "./AdminPage.css";
 const AdminPage = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
 
-  // User States
+ 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +18,7 @@ const AdminPage = () => {
   const [companyLogo, setCompanyLogo] = useState("");
   
 
-  // File Upload & Message States
+  
   const [selectedFile, setSelectedFile] = useState(null);
   const [excelData, setExcelData] = useState([]);
   const fileInputRef = useRef(null);

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-//import { showErrorToast } from "../compo/Error"; // Ensure this function exists in Error.jsx
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -19,7 +19,7 @@ function Login() {
       );
       setLoading(false);
 
-      localStorage.setItem("currentUser", JSON.stringify(data));
+      localStorage.setItem("currentUser", JSON.stringify(data)); // Store the whole data object including the token
       toast.success("Login Successful!", { position: "top-right", autoClose: 2000 });
 
       setTimeout(() => {
@@ -27,7 +27,7 @@ function Login() {
       }, 2000);
     } catch (error) {
       setLoading(false);
-     toast.error("Invalid Credentials"); // ✅ Using showErrorToast
+     toast.error("Invalid Credentials");
     }
   }
 
