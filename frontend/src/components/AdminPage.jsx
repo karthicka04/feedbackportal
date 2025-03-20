@@ -7,20 +7,18 @@ import "./AdminPage.css";
 const AdminPage = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
 
- 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [registerNo, setRegisterNo] = useState("");
+  const [department, setDepartment] = useState("");
+  const [batch, setBatch] = useState("");
 
- 
   const [companyName, setCompanyName] = useState("");
   const [companyLocation, setCompanyLocation] = useState("");
   const [companyLogo, setCompanyLogo] = useState("");
-  
 
-  
   const [selectedFile, setSelectedFile] = useState(null);
-  const [excelData, setExcelData] = useState([]);
   const fileInputRef = useRef(null);
 
   // **Handle User Addition**
@@ -31,12 +29,19 @@ const AdminPage = () => {
         name,
         email,
         password,
+        registerNo, // Added missing fields
+        department,
+        batch,
       });
       toast.success("User added successfully ✅");
       setName("");
       setEmail("");
       setPassword("");
+      setRegisterNo("");
+      setDepartment("");
+      setBatch("");
     } catch (error) {
+      console.error(error.response?.data || error.message);
       toast.error("Error adding user ❌");
     }
   };
@@ -54,8 +59,8 @@ const AdminPage = () => {
       setCompanyName("");
       setCompanyLocation("");
       setCompanyLogo("");
-      
     } catch (error) {
+      console.error(error.response?.data || error.message);
       toast.error("Error adding company ❌");
     }
   };
@@ -66,10 +71,10 @@ const AdminPage = () => {
       toast.error("Please select a file first ❗");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("file", selectedFile);
-  
+
     try {
       await axios.post(`http://localhost:5000/api/admin/bulk-upload/${type}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -80,6 +85,7 @@ const AdminPage = () => {
       toast.error(`Error uploading ${type} file ❌`);
     }
   };
+
   // **Handle File Selection**
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -100,7 +106,6 @@ const AdminPage = () => {
       const sheet = workbook.Sheets[sheetName];
       const parsedData = XLSX.utils.sheet_to_json(sheet);
 
-      // Validate Data Format
       if (parsedData.length === 0) {
         toast.error("Excel file is empty ❌");
         return;
@@ -110,15 +115,17 @@ const AdminPage = () => {
         name: row["Name"] || "",
         email: row["Email"] || "",
         password: row["Password"] || "",
+        registerNo: row["RegisterNo"] || "", // Fixed typo
+        department: row["Department"] || "",
+        batch: row["Batch"] || "",
       }));
 
-      setExcelData(validData);
+      console.log(validData);
     };
   };
 
   return (
     <div className="admin-container">
-      {/* Sidebar Navigation */}
       <aside className="sidebar">
         <button onClick={() => setActiveSection("dashboard")}>Dashboard</button>
         <button onClick={() => setActiveSection("addUser")}>Add Users</button>
@@ -126,12 +133,9 @@ const AdminPage = () => {
         <button onClick={() => setActiveSection("bulkUpload")}>Bulk Upload</button>
       </aside>
 
-      {/* Main Content */}
       <main className="content">
-        {/* Dashboard */}
         {activeSection === "dashboard" && <h2>Welcome to Admin Dashboard 🎉</h2>}
 
-        {/* Add User Section */}
         {activeSection === "addUser" && (
           <>
             <h2>Add User</h2>
@@ -139,12 +143,14 @@ const AdminPage = () => {
               <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
               <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
               <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <input type="text" placeholder="Register No" value={registerNo} onChange={(e) => setRegisterNo(e.target.value)} required />
+              <input type="text" placeholder="Department" value={department} onChange={(e) => setDepartment(e.target.value)} required />
+              <input type="text" placeholder="Batch" value={batch} onChange={(e) => setBatch(e.target.value)} required />
               <button type="submit">Add User</button>
             </form>
           </>
         )}
 
-        {/* Add Company Section */}
         {activeSection === "addCompany" && (
           <>
             <h2>Add Company</h2>
@@ -152,13 +158,11 @@ const AdminPage = () => {
               <input type="text" placeholder="Company Name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
               <input type="text" placeholder="Location" value={companyLocation} onChange={(e) => setCompanyLocation(e.target.value)} required />
               <input type="text" placeholder="Logo URL" value={companyLogo} onChange={(e) => setCompanyLogo(e.target.value)} required />
-              
               <button type="submit">Add Company</button>
             </form>
           </>
         )}
 
-        {/* Bulk Upload Section */}
         {activeSection === "bulkUpload" && (
           <>
             <h2>Bulk Upload</h2>

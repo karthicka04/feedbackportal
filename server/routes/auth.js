@@ -37,6 +37,9 @@ router.post("/login", async (req, res) => {
                     name: user.name,
                     email: user.email,
                     isAdmin: user.isAdmin,
+                    registerNo:user.registerNo,
+                    department:user.department,
+                    batch: user.batch,
                     _id: user._id,
                 },
                 JWT_SECRET,  // Use your secret key from .env
@@ -47,6 +50,9 @@ router.post("/login", async (req, res) => {
                 name: user.name,
                 email: user.email,
                 isAdmin: user.isAdmin,
+                registerNo:user.registerNo,
+                department:user.department,
+                batch: user.batch,
                 _id: user._id,
                 token: token  // Include the token in the response
             };

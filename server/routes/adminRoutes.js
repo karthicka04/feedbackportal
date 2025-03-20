@@ -13,12 +13,12 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 router.post("/add-user", async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password,registerNo,department,batch } = req.body;
 
       
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = new User({ name, email, password: hashedPassword });
+        const user = new User({ name, email, password: hashedPassword ,registerNo,department,batch });
         await user.save();
         res.status(201).json({ message: "User added successfully" });
     } catch (err) {
@@ -51,12 +51,16 @@ router.post("/bulk-upload/:type", upload.single("file"), async (req, res) => {
         let data = XLSX.utils.sheet_to_json(sheet);
 
         if (type === "user") {
-           
             const usersWithHashedPasswords = await Promise.all(
-                data.map(async (user) => ({
-                    ...user,
-                    password: await bcrypt.hash(user.password, 10),
-                }))
+                data.map(async (user) => {
+                    if (!user.password) {
+                        throw new Error(`Missing password for user: ${user.email || "Unknown"}`);
+                    }
+                    return {
+                        ...user,
+                        password: await bcrypt.hash(user.password.toString(), 10),
+                    };
+                })
             );
             await User.insertMany(usersWithHashedPasswords);
         } else if (type === "company") {

@@ -24,8 +24,7 @@ function App() {
                 <Route path="/home" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/admin" element={<AdminPage />} />
-                {/* Remove this: */}
-                {/* <Route path="/post/:companyId" element={<Form />} /> */}
+               
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/editfeedback/:feedbackId" element={<EditFeedback />} />
                 <Route path="/company/:companyId" element={<CompanyFeedbackPage />} /> {/* Update this route */}
