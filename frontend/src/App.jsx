@@ -12,22 +12,26 @@ import ViewFeedback from "./components/ViewFeedback";
 import FeedbackDetails from "./components/FeedbackDetails";
 import { ToastContainer } from "react-toastify";
 import Recruiters from "./components/Recruiter";
-import CompanyFeedbackPage from "./components/CompanyFeedbackPage"; // Import the new component
+import CompanyFeedbackPage from "./components/CompanyFeedbackPage"; 
+
+
 
 function App() {
     return (
         <Router>
-            <Navbar />
+            <Navbar />  
             <ToastContainer closeButton={false} />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/admin" element={<AdminPage />} />
+
                
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/editfeedback/:feedbackId" element={<EditFeedback />} />
-                <Route path="/company/:companyId" element={<CompanyFeedbackPage />} /> {/* Update this route */}
+                <Route path="/editfeedback/:feedbackId"/>
+               
+                <Route path="/company/:companyId" element={<CompanyFeedbackPage />} /> 
                 <Route path="/feedback/:id" element={<FeedbackDetails />} />
                 <Route path="/recruiters" element={<Recruiters />} />
             </Routes>

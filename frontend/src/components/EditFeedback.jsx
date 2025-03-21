@@ -88,11 +88,11 @@ const EditFeedback = () => {
     };
 
     useEffect(() => {
-        // Ensure that the 'rounds' array has the correct number of elements based on 'totalRounds'
+       
         if (formData.totalRounds > formData.rounds.length) {
             const newRounds = [...formData.rounds];
             for (let i = formData.rounds.length; i < formData.totalRounds; i++) {
-                newRounds.push({ roundName: '', questions: [] }); // Initialize questions to []
+                newRounds.push({ roundName: '', questions: [] }); 
             }
             setFormData(prevFormData => ({ ...prevFormData, rounds: newRounds }));
         }
@@ -103,10 +103,10 @@ const EditFeedback = () => {
         setFormData(prevFormData => {
             const updatedRounds = [...prevFormData.rounds];
             if (!updatedRounds[roundIndex]) {
-                updatedRounds[roundIndex] = { questions: [] }; // Initialize questions to []
+                updatedRounds[roundIndex] = { questions: [] }; 
             }
             if (!updatedRounds[roundIndex].questions) {
-                updatedRounds[roundIndex].questions = []; // Ensure questions array exists
+                updatedRounds[roundIndex].questions = [];
             }
             const updatedQuestions = [...updatedRounds[roundIndex].questions];
             updatedQuestions[questionIndex] = value;
@@ -119,10 +119,10 @@ const EditFeedback = () => {
         setFormData(prevFormData => {
             const updatedRounds = [...prevFormData.rounds];
             if (!updatedRounds[roundIndex]) {
-                updatedRounds[roundIndex] = { questions: [] }; // Initialize questions to []
+                updatedRounds[roundIndex] = { questions: [] }; 
             }
             if (!updatedRounds[roundIndex].questions) {
-                updatedRounds[roundIndex].questions = []; // Ensure questions array exists
+                updatedRounds[roundIndex].questions = []; 
             }
             updatedRounds[roundIndex].questions = [...updatedRounds[roundIndex].questions, ''];
             return { ...prevFormData, rounds: updatedRounds };
@@ -147,7 +147,7 @@ const EditFeedback = () => {
 
         setIsLoading(true);
         try {
-            await axios.put(`http://localhost:5000/api/feedback/${feedbackId}`, formData); // Send the entire form data
+            await axios.put(`http://localhost:5000/api/feedback/${feedbackId}`, formData); 
 
             alert('Feedback updated successfully!');
             navigate('/profile');
@@ -162,8 +162,7 @@ const EditFeedback = () => {
     const generateRoundInputs = () => {
         const roundInputs = [];
         for (let i = 0; i < formData.totalRounds; i++) {
-            const round = formData.rounds[i] || { roundName: '', questions: [] }; // Ensure round exists
-
+            const round = formData.rounds[i] || { roundName: '', questions: [] }; 
             roundInputs.push(
                 <div key={i}>
                     <h3>Round {i + 1}</h3>
@@ -249,7 +248,7 @@ const EditFeedback = () => {
                 />
             </label>
 
-            {/* Department Dropdown */}
+           
             <label>
                 Department:
                 <select
@@ -312,7 +311,7 @@ const EditFeedback = () => {
                 </select>
             </label>
 
-            {/* Month and Year of Placement */}
+          
             <label>
                 Month of Placement:
                 <select name="month" value={formData.month} onChange={handleChange} required>
@@ -343,7 +342,7 @@ const EditFeedback = () => {
                 />
             </label>
 
-            {/* Total Rounds Input */}
+       
             <label>
                 Total Number of Rounds:
                 <input

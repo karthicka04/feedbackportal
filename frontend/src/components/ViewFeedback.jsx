@@ -8,7 +8,7 @@ const ViewFeedback = ({companyId}) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    // const { companyId } = useParams(); // Get companyId from the URL, No need for this line
+   
     const [likedFeedbacks, setLikedFeedbacks] = useState({});
     const [bookmarkedFeedbacks, setBookmarkedFeedbacks] = useState({});
     const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -30,20 +30,20 @@ const ViewFeedback = ({companyId}) => {
                     return;
                 }
 
-                console.log("Fetching companyId:", companyId); // Debugging log
+                console.log("Fetching companyId:", companyId);
 
-                const response = await fetch(`http://localhost:5000/api/feedback?companyId=${companyId}`); // Corrected URL
+                const response = await fetch(`http://localhost:5000/api/feedback?companyId=${companyId}`); 
                 if (!response.ok) {
                     if (response.status === 404) {
-                        navigate("/recruiters"); // Redirect if companyId is invalid
+                        navigate("/recruiters"); 
                         return;
                     }
-                    throw new Error(`Failed to fetch feedback: ${response.status}`); // More informative error
+                    throw new Error(`Failed to fetch feedback: ${response.status}`); 
                 }
 
                 const data = await response.json();
                 setFeedbacks(data);
-                console.log("Fetched feedback data:", data); // Log the data
+                console.log("Fetched feedback data:", data); 
             } catch (err) {
                 console.error("Error fetching feedback:", err);
                 setError(err.message);
@@ -112,7 +112,7 @@ const ViewFeedback = ({companyId}) => {
             <div className="feed-list">
                 {feedbacks.map((feedback) => (
                     <div key={feedback._id} className="feedback-card">
-                        {/* Header: Profile & Student Info */}
+                      
                         <div className="feedback-header">
                             <div className="profile-icon">{feedback.name.charAt(0).toUpperCase()}</div>
                             <div className="user-info">
@@ -123,7 +123,7 @@ const ViewFeedback = ({companyId}) => {
                             </div>
                         </div>
 
-                        {/* Company Details */}
+                        
                         <div className="company-info">
                             <p>
                                 <strong>🏢 Company:</strong> {feedback.companyName}
@@ -133,7 +133,7 @@ const ViewFeedback = ({companyId}) => {
                             </p>
                         </div>
 
-                        {/* Actions: Like, Bookmark, Report */}
+                        
                         <div className="feedback-actions">
                             <button onClick={() => toggleLike(feedback._id)}>
                                 {likedFeedbacks[feedback._id] ? <FaHeart color="red" /> : <FaRegHeart />}
