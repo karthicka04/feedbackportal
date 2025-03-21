@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -18,20 +19,20 @@ router.post("/login", async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({ email }); // Find user by email
+        const user = await User.findOne({ email });
 
         if (!user) {
             console.log("User not found!");
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        // Compare the entered password with the hashed password
+      
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (isPasswordValid) {
             console.log("User found:", user);
 
-            // Generate JWT token with 1-hour expiry
+          
             const token = jwt.sign(
                 {
                     name: user.name,
@@ -42,8 +43,8 @@ router.post("/login", async (req, res) => {
                     batch: user.batch,
                     _id: user._id,
                 },
-                JWT_SECRET,  // Use your secret key from .env
-                { expiresIn: "1h" } // Token expires in 1 hour
+                JWT_SECRET,  
+                { expiresIn: "1h" } 
             );
 
             const temp = {
@@ -54,7 +55,7 @@ router.post("/login", async (req, res) => {
                 department:user.department,
                 batch: user.batch,
                 _id: user._id,
-                token: token  // Include the token in the response
+                token: token 
             };
             return res.send(temp);
         } else {
@@ -64,6 +65,56 @@ router.post("/login", async (req, res) => {
     } catch (error) {
         console.error("Error during login:", error);
         return res.status(500).json({ error: "Server error" });
+    }
+});
+router.put('/:id', async (req, res) => {
+    try {
+        const UserId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(UserId)) {
+            return res.status(400).json({ error: 'Invalid userId: Not a valid ObjectId.' });
+        }
+
+        const {
+            name,
+            email,
+            registerNo,
+            department,
+            batch,
+            password  // Include password in the request body
+        } = req.body;
+
+        // Find the user first
+        const user = await User.findById(UserId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+         // Hash the password if a new one is provided
+        let hashedPassword = user.password; // Keep the existing password if not changed
+
+        if (password && password.trim() !== '') {
+            hashedPassword = await bcrypt.hash(password, 10);
+        }
+
+        // Update the user document
+        user.name = name;
+        user.email = email;
+        user.registerNo = registerNo;
+        user.department = department;
+        user.batch = batch;
+        user.password = hashedPassword;
+
+         // Save the updated user
+        const updatedUser = await user.save();
+
+        console.log('Profile updated successfully:', updatedUser);
+        res.status(200).json({ message: 'Profile updated successfully!', user: updatedUser });
+
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ error: 'Validation failed', details: error.errors });
+        }
+        res.status(500).json({ error: 'Failed to update profile.', details: error.message, stack: error.stack });
     }
 });
 
