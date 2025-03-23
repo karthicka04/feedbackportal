@@ -7,11 +7,11 @@ import './Navbar.css';
 const Navbar = () => {
   const [dropdownOpen1, setDropdownOpen1] = useState(false);
   const user = JSON.parse(localStorage.getItem("currentUser"));
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   const logout = () => {
     localStorage.removeItem('currentUser');
-    navigate('/login'); // Use navigate for redirection
+    navigate('/login'); 
   };
 
   return (
@@ -32,7 +32,7 @@ const Navbar = () => {
                     className="profile-circle"
                     onClick={() => setDropdownOpen1(!dropdownOpen1)}
                   >
-                    {user.name.charAt(0).toUpperCase()}
+                   {user.name.charAt(0)}
                   </div>
                   {dropdownOpen1 && (
                     <div className="dropdown-menu1">

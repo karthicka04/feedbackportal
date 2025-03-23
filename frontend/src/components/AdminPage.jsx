@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import { toast } from "react-toastify";
@@ -6,7 +6,8 @@ import "./AdminPage.css";
 
 const AdminPage = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
-
+  
+  // User state
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,14 +15,31 @@ const AdminPage = () => {
   const [department, setDepartment] = useState("");
   const [batch, setBatch] = useState("");
 
+  // Company state
   const [companyName, setCompanyName] = useState("");
   const [companyLocation, setCompanyLocation] = useState("");
   const [companyLogo, setCompanyLogo] = useState("");
 
+  // File upload state
   const [selectedFile, setSelectedFile] = useState(null);
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState("");
+  const [file, setFile] = useState(null);
+  
   const fileInputRef = useRef(null);
 
-  // **Handle User Addition**
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/recruiters");
+        setCompanies(response.data);
+      } catch (error) {
+        console.error("Error fetching companies:", error);
+      }
+    };
+    fetchCompanies();
+  }, []);
+
   const handleAddUser = async (e) => {
     e.preventDefault();
     try {
@@ -29,7 +47,7 @@ const AdminPage = () => {
         name,
         email,
         password,
-        registerNo, // Added missing fields
+        registerNo,
         department,
         batch,
       });
@@ -46,7 +64,6 @@ const AdminPage = () => {
     }
   };
 
-  // **Handle Company Addition**
   const handleAddCompany = async (e) => {
     e.preventDefault();
     try {
@@ -65,7 +82,6 @@ const AdminPage = () => {
     }
   };
 
-  // **Handle Bulk Upload**
   const handleBulkUpload = async (type) => {
     if (!selectedFile) {
       toast.error("Please select a file first ❗");
@@ -86,41 +102,47 @@ const AdminPage = () => {
     }
   };
 
-  // **Handle File Selection**
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      readExcel(file);
-    }
+    setSelectedFile(e.target.files[0]);
   };
 
-  // **Read Excel File**
-  const readExcel = (file) => {
+  const handleFileChange1 = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleCompanyChange = (event) => {
+    setSelectedCompany(event.target.value);
+  };
+
+  const handleUpload = async () => {
+    if (!file || !selectedCompany) {
+      toast.error("Please select a company and upload an Excel file.");
+      return;
+    }
+
     const reader = new FileReader();
-    reader.readAsArrayBuffer(file);
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
+    reader.readAsBinaryString(file);
+    reader.onload = async (e) => {
+      const binaryStr = e.target.result;
+      const workbook = XLSX.read(binaryStr, { type: "binary" });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
-      const parsedData = XLSX.utils.sheet_to_json(sheet);
+      const data = XLSX.utils.sheet_to_json(sheet);
+      console.log("hi");
 
-      if (parsedData.length === 0) {
-        toast.error("Excel file is empty ❌");
-        return;
+      try {
+        const response = await axios.post("http://localhost:5000/api/attendees/upload-attendees", {
+          companyId: selectedCompany,
+          attendees: data,
+        });
+
+        if (response.status === 201) {
+          toast.success("Attendees uploaded successfully!");
+        }
+      } catch (error) {
+        console.error("Error uploading attendees:", error);
+        toast.error("Failed to upload attendees.");
       }
-
-      const validData = parsedData.map((row) => ({
-        name: row["Name"] || "",
-        email: row["Email"] || "",
-        password: row["Password"] || "",
-        registerNo: row["RegisterNo"] || "", // Fixed typo
-        department: row["Department"] || "",
-        batch: row["Batch"] || "",
-      }));
-
-      console.log(validData);
     };
   };
 
@@ -131,44 +153,36 @@ const AdminPage = () => {
         <button onClick={() => setActiveSection("addUser")}>Add Users</button>
         <button onClick={() => setActiveSection("addCompany")}>Add Company</button>
         <button onClick={() => setActiveSection("bulkUpload")}>Bulk Upload</button>
+        <button onClick={() => setActiveSection("AttendiesUpload")}>Attendees Upload</button>
       </aside>
-
       <main className="content">
         {activeSection === "dashboard" && <h2>Welcome to Admin Dashboard 🎉</h2>}
-
         {activeSection === "addUser" && (
-          <>
-            <h2>Add User</h2>
-            <form onSubmit={handleAddUser}>
-              <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              <input type="text" placeholder="Register No" value={registerNo} onChange={(e) => setRegisterNo(e.target.value)} required />
-              <input type="text" placeholder="Department" value={department} onChange={(e) => setDepartment(e.target.value)} required />
-              <input type="text" placeholder="Batch" value={batch} onChange={(e) => setBatch(e.target.value)} required />
-              <button type="submit">Add User</button>
-            </form>
-          </>
+          <form onSubmit={handleAddUser}>
+            <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <button type="submit">Add User</button>
+          </form>
         )}
-
         {activeSection === "addCompany" && (
-          <>
-            <h2>Add Company</h2>
-            <form onSubmit={handleAddCompany}>
-              <input type="text" placeholder="Company Name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
-              <input type="text" placeholder="Location" value={companyLocation} onChange={(e) => setCompanyLocation(e.target.value)} required />
-              <input type="text" placeholder="Logo URL" value={companyLogo} onChange={(e) => setCompanyLogo(e.target.value)} required />
-              <button type="submit">Add Company</button>
-            </form>
-          </>
+          <form onSubmit={handleAddCompany}>
+            <input type="text" placeholder="Company Name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+            <button type="submit">Add Company</button>
+          </form>
         )}
-
         {activeSection === "bulkUpload" && (
+          <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} ref={fileInputRef} />
+        )}
+        {activeSection === "AttendiesUpload" && (
           <>
-            <h2>Bulk Upload</h2>
-            <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} ref={fileInputRef} />
-            <button onClick={() => handleBulkUpload("user")}>Upload Users</button>
-            <button onClick={() => handleBulkUpload("company")}>Upload Companies</button>
+            <select value={selectedCompany} onChange={handleCompanyChange}>
+              <option value="">Select a company</option>
+              {companies.map((company) => (
+                <option key={company._id} value={company._id}>{company.name}</option>
+              ))}
+            </select>
+            <input type="file" accept=".xlsx, .xls" onChange={handleFileChange1} />
+            <button onClick={handleUpload}>Upload</button>
           </>
         )}
       </main>

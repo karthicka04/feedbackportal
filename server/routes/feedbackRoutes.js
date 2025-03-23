@@ -1,4 +1,4 @@
-// server/routes/feedbackRoutes.js
+
 import express from 'express';
 const router = express.Router();
 import mongoose from 'mongoose';

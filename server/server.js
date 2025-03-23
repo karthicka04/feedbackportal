@@ -8,6 +8,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import viewFeedbackRoutes from "./routes/viewFeedback.js";
 import RecruitersRoutes from "./routes/RecruitersRoutes.js";
+import attendeeRoutes from "./routes/attendees.js";
 
 
 dotenv.config();
@@ -29,6 +30,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/viewFeedback", viewFeedbackRoutes);
 app.use('/api/recruiters', RecruitersRoutes);
+app.use('/api/attendees',attendeeRoutes)
 
 
 

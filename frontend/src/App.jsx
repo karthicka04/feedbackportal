@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Home from "./components/Home";
@@ -17,6 +17,11 @@ import CompanyFeedbackPage from "./components/CompanyFeedbackPage";
 
 
 function App() {
+    useEffect(()=>{
+        window.onbeforeunload=()=>{
+            localStorage.removeItem('currentUser');
+        }
+    },[]);
     return (
         <Router>
             <Navbar />  
@@ -24,7 +29,8 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/home" element={<Home />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<Login   />} />
+               
                 <Route path="/admin" element={<AdminPage />} />
 
                

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";  // Import useNavigate
 
-
-function Login() {
+function Login() {  // Receive setUserData as a prop
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();  // Initialize useNavigate
 
   async function login() {
     const user = { email, password };
@@ -17,17 +18,20 @@ function Login() {
         "http://localhost:5000/api/auth/login",
         user
       );
+      console.log(data);
       setLoading(false);
 
-      localStorage.setItem("currentUser", JSON.stringify(data)); // Store the whole data object including the token
+      localStorage.setItem("currentUser", JSON.stringify(data));  // Store the response data
+
       toast.success("Login Successful!", { position: "top-right", autoClose: 2000 });
 
-      setTimeout(() => {
-        window.location.href = "/home";
-      }, 2000);
+      //  Now use navigate to redirect
+      navigate("/home");
+
     } catch (error) {
       setLoading(false);
-     toast.error("Invalid Credentials");
+      toast.error("Invalid Credentials", { position: "top-right", autoClose: 2000 });
+      console.error("Login error:", error.response ? error.response.data : error.message); // Log the error
     }
   }
 
@@ -52,8 +56,8 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button className="btn btn-primary mt-3" onClick={login}>
-              Login
+            <button className="btn btn-primary mt-3" onClick={login} disabled={loading}>  {/* Disable button while loading */}
+              {loading ? "Logging in..." : "Login"}  {/* Show appropriate text */}
             </button>
           </div>
         </div>
