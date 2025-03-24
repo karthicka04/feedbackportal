@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
   isAdmin: { type: Boolean, default: false },
   registerNo: { type: String, required: true, unique: true }, 
   department: { type: String, required: true }, 
-  batch: { type: String, required: true },      
+  batch: { type: String, required: true }, 
+     
 });
 
 const User = mongoose.model("User", userSchema);

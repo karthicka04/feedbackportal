@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
 
-function Login() {  // Receive setUserData as a prop
+function Login() {  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();  // Initialize useNavigate
+  const navigate = useNavigate();  
 
   async function login() {
     const user = { email, password };
@@ -21,17 +21,17 @@ function Login() {  // Receive setUserData as a prop
       console.log(data);
       setLoading(false);
 
-      localStorage.setItem("currentUser", JSON.stringify(data));  // Store the response data
+      localStorage.setItem("currentUser", JSON.stringify(data));  
 
       toast.success("Login Successful!", { position: "top-right", autoClose: 2000 });
 
-      //  Now use navigate to redirect
+      
       navigate("/home");
 
     } catch (error) {
       setLoading(false);
       toast.error("Invalid Credentials", { position: "top-right", autoClose: 2000 });
-      console.error("Login error:", error.response ? error.response.data : error.message); // Log the error
+      console.error("Login error:", error.response ? error.response.data : error.message); 
     }
   }
 

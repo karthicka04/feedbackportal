@@ -11,6 +11,7 @@ import RecruitersRoutes from "./routes/RecruitersRoutes.js";
 import attendeeRoutes from "./routes/attendees.js";
 
 
+
 dotenv.config();
 
 
@@ -30,7 +31,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/viewFeedback", viewFeedbackRoutes);
 app.use('/api/recruiters', RecruitersRoutes);
-app.use('/api/attendees',attendeeRoutes)
+app.use('/api/attendees',attendeeRoutes);
+
 
 
 

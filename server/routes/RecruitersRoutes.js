@@ -38,4 +38,5 @@ router.get("/company/:companyId", async (req, res) => {
     }
 });
 
+
 export default router;

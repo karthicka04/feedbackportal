@@ -92,8 +92,9 @@ const feedbackSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
-    likes: { type: Number, default: 0 },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    flagedBy:[{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields

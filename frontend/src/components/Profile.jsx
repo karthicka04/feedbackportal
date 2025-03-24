@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
  const Profile = () => {
      const [user, setUser] = useState(null);
      const [feedbackList, setFeedbackList] = useState([]);
+     const [savedList,setSavedList] = useState([]);
      const [selectedSection, setSelectedSection] = useState('profile');
      const [editMode, setEditMode] = useState(false);
      const [profileData, setProfileData] = useState({}); 
@@ -268,12 +269,13 @@ import React, { useState, useEffect } from 'react';
                          )}
                      </div>
                  );
-             case 'saved':
-                 return (
-                     <div>
-                         <h3>Saved Feedback</h3>
-                     </div>
-                 );
+                 case 'saved':
+                    return (
+                        <div className="feedback-section">
+                            <h3>Your Saved:</h3>
+                            
+                        </div>
+                    );
              case 'notifications':
                  return (
                      <div>
