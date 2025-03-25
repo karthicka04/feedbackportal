@@ -250,24 +250,24 @@ import React, { useState, useEffect } from 'react';
                  );
              case 'feedback':
                  return (
-                     <div className="feedback-section">
-                         <h3>Your Feedback:</h3>
-                         {feedbackList.length > 0 ? (
-                             <ul className="feedback-list">
-                                 {feedbackList.map((feedback) => (
-                                     <li key={feedback._id}>
-                                         <div className="feedback-text">
-                                             <span className="company">{feedback.companyName}</span>
-                                             <span className="role">{feedback.role}</span>
-                                         </div>
-                                         <FaEdit className="edit-icon" onClick={() => navigate(`/updateprofile/${user._id}`)} />
-                                     </li>
-                                 ))}
-                             </ul>
-                         ) : (
-                             <p className="no-feedback">No feedback submitted yet.</p>
-                         )}
-                     </div>
+                    <div className="feedback-section">
+                    <h3>Your Feedback:</h3>
+                    {feedbackList.length > 0 ? (
+                      <ul className="feedback-list">
+                        {feedbackList.map((feedback) => (
+                          <li key={feedback._id}>
+                            <div className="feedback-text">
+                              <span className="company">{feedback.companyName}</span>
+                              <span className="role">{feedback.role}</span>
+                            </div>
+                            <FaEdit className="edit-icon" onClick={() => navigate(`/editfeedback/${feedback._id}`)} />
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="no-feedback">No feedback submitted yet.</p>
+                    )}
+                  </div>
                  );
                  case 'saved':
                     return (
@@ -301,6 +301,7 @@ import React, { useState, useEffect } from 'react';
                          <li onClick={() => handleSectionClick('notifications')} className={selectedSection === 'notifications' ? 'active' : ''}>
                              <FaBell style={{ marginRight: '10px' }} /> Notifications
                          </li>
+                         
                          <li onClick={() => handleSectionClick('feedback')} className={selectedSection === 'feedback' ? 'active' : ''}>
                              <FaCommentAlt style={{ marginRight: '10px' }} /> Posted Feedbacks
                          </li>

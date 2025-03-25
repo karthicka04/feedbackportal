@@ -56,8 +56,8 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button className="btn btn-primary mt-3" onClick={login} disabled={loading}>  {/* Disable button while loading */}
-              {loading ? "Logging in..." : "Login"}  {/* Show appropriate text */}
+            <button className="btn btn-primary mt-3" onClick={login} disabled={loading}> 
+              {loading ? "Logging in..." : "Login"}  
             </button>
           </div>
         </div>

@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import ViewFeedback from "./ViewFeedback";
 import Form from "./Form";
-import "./CompanyFeedbackPage.css"; // Create this CSS file
+import "./CompanyFeedbackPage.css";
 
 const CompanyFeedbackPage = () => {
     const { companyId } = useParams();
-    const [activeTab, setActiveTab] = useState("view"); // "view" or "post"
+    const [activeTab, setActiveTab] = useState("view");
     const [companyName, setCompanyName] = useState("");
     const [companyLocation, setCompanyLocation] = useState("");
     const [loading, setLoading] = useState(true);
@@ -16,15 +16,11 @@ const CompanyFeedbackPage = () => {
     useEffect(() => {
         const fetchCompanyData = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/recruiters/company/${companyId}`); // Create new backend route
-
-                if (response.status !== 200) {
-                    throw new Error("Failed to fetch company data");
-                }
-
-                const company = response.data;
-                setCompanyName(company.name);
-                setCompanyLocation(company.location);
+                const response = await axios.get(`http://localhost:5000/api/recruiters/company/${companyId}`);
+                if (response.status !== 200) throw new Error("Failed to fetch company data");
+                
+                setCompanyName(response.data.name);
+                setCompanyLocation(response.data.location);
                 setLoading(false);
             } catch (err) {
                 console.error("Error fetching company data:", err);
@@ -36,20 +32,25 @@ const CompanyFeedbackPage = () => {
         fetchCompanyData();
     }, [companyId]);
 
-    if (loading) return <p>Loading company data...</p>;
-    if (error) return <p>Error: {error}</p>;
+    if (loading) return <div className="loading-spinner"></div>;
+    if (error) return <div className="error-message">Error: {error}</div>;
 
     return (
-        <div className="company-feedback-page">
-            <div className="tab-buttons">
+        <div className="company-feedback-container">
+            <header className="company-header">
+                <h1>{companyName}</h1>
+                <p className="company-location">{companyLocation}</p>
+            </header>
+
+            <div className="feedback-tabs">
                 <button
-                    className={activeTab === "view" ? "active" : ""}
+                    className={`tab-button ${activeTab === "view" ? "active" : ""}`}
                     onClick={() => setActiveTab("view")}
                 >
                     View Feedback
                 </button>
                 <button
-                    className={activeTab === "post" ? "active" : ""}
+                    className={`tab-button ${activeTab === "post" ? "active" : ""}`}
                     onClick={() => setActiveTab("post")}
                 >
                     Post Feedback
@@ -60,7 +61,11 @@ const CompanyFeedbackPage = () => {
                 {activeTab === "view" ? (
                     <ViewFeedback companyId={companyId} />
                 ) : (
-                    <Form companyId={companyId} initialCompanyName={companyName} initialCompanyLocation={companyLocation} />
+                    <Form 
+                        companyId={companyId} 
+                        initialCompanyName={companyName} 
+                        initialCompanyLocation={companyLocation} 
+                    />
                 )}
             </div>
         </div>

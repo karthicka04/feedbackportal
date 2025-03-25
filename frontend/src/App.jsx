@@ -35,7 +35,7 @@ function App() {
 
                
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/editfeedback/:feedbackId"/>
+                <Route path="/editfeedback/:feedbackId" element={<EditFeedback />} />
                
                 <Route path="/company/:companyId" element={<CompanyFeedbackPage />} /> 
                 <Route path="/feedback/:id" element={<FeedbackDetails />} />

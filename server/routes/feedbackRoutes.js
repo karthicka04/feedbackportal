@@ -156,9 +156,6 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const feedbackId = req.params.id;
-         if (!mongoose.Types.ObjectId.isValid(feedbackId)) {
-                 return res.status(400).json({ error: 'Invalid feedbackId: Not a valid ObjectId.' });
-            }
         const {
             name,
             rollNumber,
@@ -176,7 +173,6 @@ router.put('/:id', async (req, res) => {
             preparationTime,
             skillsUsed,
             privacyAgreement,
-            companyId //verify the company ID
         } = req.body;
 
         // Find the feedback by ID and update it
@@ -200,7 +196,7 @@ router.put('/:id', async (req, res) => {
                 skillsUsed,
                 privacyAgreement,
             },
-            { new: true, runValidators: true } //  `new: true` to return the updated document and `runValidators: true` to ensure validation during the update.
+            { new: true, runValidators: true } //  new: true to return the updated document and runValidators: true to ensure validation during the update.
         );
 
         if (!updatedFeedback) {
@@ -212,11 +208,7 @@ router.put('/:id', async (req, res) => {
 
     } catch (error) {
         console.error('Error updating feedback:', error);
-        if (error.name === 'ValidationError') {
-                return res.status(400).json({ error: 'Validation failed', details: error.errors });
-            }
-        res.status(500).json({ error: 'Failed to update feedback.', details: error.message, stack: error.stack });
+        res.status(500).json({ error: 'Failed to update feedback.', details: error.message });
     }
 });
-
 export default router;

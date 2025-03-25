@@ -7,12 +7,11 @@ const ViewFeedback = ({ companyId }) => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
   const [likedFeedbacks, setLikedFeedbacks] = useState({});
   const [bookmarkedFeedbacks, setBookmarkedFeedbacks] = useState({});
-  const [FlagedFeedbacks, setFlagedFeedbacks] = useState({});
+  const [flaggedFeedbacks, setFlaggedFeedbacks] = useState({});
 
+  const navigate = useNavigate();
 
   const user = localStorage.getItem("currentUser")
     ? JSON.parse(localStorage.getItem("currentUser"))
@@ -22,23 +21,19 @@ const ViewFeedback = ({ companyId }) => {
     if (!user || !user._id) {
       console.warn("User not logged in. Redirecting to login.");
       navigate("/login");
+    }
+  }, [navigate]); 
+  useEffect(() => {
+    if (!companyId) {
+      setError("Invalid company ID.");
+      setLoading(false);
       return;
     }
-  }, [user, navigate]);
 
-  useEffect(() => {
     const fetchFeedbacks = async () => {
-      if (!companyId) {
-        setError("Invalid company ID.");
-        setLoading(false);
-        return;
-      }
-
       try {
         console.log("Fetching feedback for companyId:", companyId);
-        const response = await fetch(
-          `http://localhost:5000/api/feedback?companyId=${companyId}`
-        );
+        const response = await fetch(`http://localhost:5000/api/feedback?companyId=${companyId}`);
 
         if (!response.ok) {
           if (response.status === 404) {
@@ -51,9 +46,7 @@ const ViewFeedback = ({ companyId }) => {
         const data = await response.json();
         setFeedbacks(data);
         console.log("Fetched feedback data:", data);
-
         initializeLikeBookmarkStatus(data);
-
       } catch (err) {
         console.error("Error fetching feedback:", err);
         setError(err.message);
@@ -70,81 +63,47 @@ const ViewFeedback = ({ companyId }) => {
 
     const initialLiked = {};
     const initialBookmarked = {};
-    const initialFlaged = {};
-
+    const initialFlagged = {};
 
     feedbacks.forEach((feedback) => {
-      initialLiked[feedback._id] = Array.isArray(feedback.likes)
-        ? feedback.likes.includes(user._id)
-        : false;
-      initialBookmarked[feedback._id] = Array.isArray(feedback.savedBy)
-        ? feedback.savedBy.includes(user._id)
-        : false;
-      initialFlaged[feedback._id] = Array.isArray(feedback.flagedBy)
-        ? feedback.flagedBy.includes(user._id)  // Corrected typo here
-        : false;
-
+      initialLiked[feedback._id] = feedback.likes?.includes(user._id) || false;
+      initialBookmarked[feedback._id] = feedback.savedBy?.includes(user._id) || false;
+      initialFlagged[feedback._id] = feedback.flaggedBy?.includes(user._id) || false;
     });
 
     setLikedFeedbacks(initialLiked);
     setBookmarkedFeedbacks(initialBookmarked);
-    setFlagedFeedbacks(initialFlaged)
+    setFlaggedFeedbacks(initialFlagged);
   };
 
   const toggleLike = async (feedbackId) => {
-    // Optimistically update the UI
-    setLikedFeedbacks((prev) => ({
-      ...prev,
-      [feedbackId]: !prev[feedbackId],
-    }));
+    setLikedFeedbacks((prev) => ({ ...prev, [feedbackId]: !prev[feedbackId] }));
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/viewFeedback/like`, // Corrected endpoint here
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user._id, feedbackId: feedbackId }),
-        }
-      );
+      const response = await fetch(`http://localhost:5000/api/viewFeedback/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user._id, feedbackId }),
+      });
 
-      if (!response.ok) {
-        // Revert the optimistic update if the server returns an error
-        setLikedFeedbacks((prev) => ({
-          ...prev,
-          [feedbackId]: !prev[feedbackId],
-        }));
-        throw new Error(`Failed to toggle like: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Failed to toggle like: ${response.status}`);
     } catch (error) {
       console.error("Error toggling like:", error);
       setError(error.message);
     }
   };
+
   const toggleFlag = async (feedbackId) => {
-    setFlagedFeedbacks((prev) => ({
-      ...prev,
-      [feedbackId]: !prev[feedbackId],
-    }));
+    setFlaggedFeedbacks((prev) => ({ ...prev, [feedbackId]: !prev[feedbackId] }));
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/viewFeedback/flag`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user._id, feedbackId: feedbackId }),
-        }
-      );
+      const response = await fetch(`http://localhost:5000/api/viewFeedback/flag`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user._id, feedbackId }),
+      });
 
-      if (!response.ok) {
-
-        setFlagedFeedbacks((prev) => ({
-          ...prev,
-          [feedbackId]: !prev[feedbackId],
-        }));
-        throw new Error(`Failed to toggle flag: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Failed to toggle flag: ${response.status}`);
     } catch (error) {
       console.error("Error toggling flag:", error);
       setError(error.message);
@@ -152,29 +111,16 @@ const ViewFeedback = ({ companyId }) => {
   };
 
   const toggleBookmark = async (feedbackId) => {
-    setBookmarkedFeedbacks((prev) => ({
-      ...prev,
-      [feedbackId]: !prev[feedbackId],
-    }));
+    setBookmarkedFeedbacks((prev) => ({ ...prev, [feedbackId]: !prev[feedbackId] }));
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/viewFeedback/bookmark`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user._id, feedbackId: feedbackId }),
-        }
-      );
+      const response = await fetch(`http://localhost:5000/api/viewFeedback/bookmark`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user._id, feedbackId }),
+      });
 
-      if (!response.ok) {
-        // Revert the optimistic update if the server returns an error
-        setBookmarkedFeedbacks((prev) => ({
-          ...prev,
-          [feedbackId]: !prev[feedbackId],
-        }));
-        throw new Error(`Failed to toggle bookmark: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Failed to toggle bookmark: ${response.status}`);
     } catch (error) {
       console.error("Error toggling bookmark:", error);
       setError(error.message);
@@ -191,9 +137,7 @@ const ViewFeedback = ({ companyId }) => {
         {feedbacks.map((feedback) => (
           <div key={feedback._id} className="feedback-card">
             <div className="feedback-header">
-              <div className="profile-icon">
-                {feedback.name.charAt(0).toUpperCase()}
-              </div>
+              <div className="profile-icon">{feedback.name.charAt(0).toUpperCase()}</div>
               <div className="user-info">
                 <p className="user-name">{feedback.name}</p>
                 <p className="user-details">
@@ -203,42 +147,23 @@ const ViewFeedback = ({ companyId }) => {
             </div>
 
             <div className="company-info">
-              <p>
-                <strong>🏢 Company:</strong> {feedback.companyName}
-              </p>
-              <p>
-                <strong>📍 Location:</strong> {feedback.companyLocation}
-              </p>
+              <p><strong>🏢 Company:</strong> {feedback.companyName}</p>
+              <p><strong>📍 Location:</strong> {feedback.companyLocation}</p>
             </div>
 
             <div className="feedback-actions">
               <button onClick={() => toggleLike(feedback._id)}>
-                {likedFeedbacks[feedback._id] ? (
-                  <FaHeart color="red" />
-                ) : (
-                  <FaRegHeart />
-                )}
+                {likedFeedbacks[feedback._id] ? <FaHeart color="red" /> : <FaRegHeart />}
               </button>
               <button onClick={() => toggleBookmark(feedback._id)}>
-                {bookmarkedFeedbacks[feedback._id] ? (
-                  <FaBookmark color="gold" />
-                ) : (
-                  <FaRegBookmark />
-                )}
+                {bookmarkedFeedbacks[feedback._id] ? <FaBookmark color="gold" /> : <FaRegBookmark />}
               </button>
               <button onClick={() => toggleFlag(feedback._id)}>
-                {FlagedFeedbacks[feedback._id] ? (
-                  <FaFlag color="black" />
-                ) : (
-                  <FaFlag />
-                )}
+                {flaggedFeedbacks[feedback._id] ? <FaFlag color="black" /> : <FaFlag />}
               </button>
             </div>
 
-            <button
-              onClick={() => navigate(`/feedback/${feedback._id}`)}
-              className="view-feedback-btn"
-            >
+            <button onClick={() => navigate(`/feedback/${feedback._id}`)} className="view-feedback-btn">
               View Full Feedback →
             </button>
           </div>

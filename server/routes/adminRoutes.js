@@ -4,6 +4,7 @@ import multer from "multer";
 import XLSX from "xlsx";
 import User from "../models/User.js";
 import Company from "../models/Company.js";
+import Flaged from "../models/Flaged.js";
 import jwt from "jsonwebtoken"; 
 import dotenv from "dotenv";
 dotenv.config();
@@ -75,5 +76,31 @@ router.post("/bulk-upload/:type", upload.single("file"), async (req, res) => {
         res.status(500).json({ error: "Bulk upload failed" });
     }
 });
+// In your adminRoutes.js
+router.get('/flagged-feedback', async (req, res) => {  // singular "feedback"
+    try {
+        const feedbacks = await Flaged.find();
+        res.json(feedbacks);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch flagged feedbacks" });
+    }
+});
+router.put('/resolve-flag/:feedbackId', async (req, res) => {
+    try {
+      const { feedbackId } = req.params;
+  
+      
+      await Flaged.findOneAndUpdate(
+        { feedbackId },
+        { resolved: true, resolvedAt: Date.now(), resolvedBy: req.user.id }
+      );
+  
+      res.json({ message: 'Flag resolved successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error resolving flag' });
+    }
+  });
+  
 
 export default router;
