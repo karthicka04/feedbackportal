@@ -1,4 +1,4 @@
-import mongoose from "mongoose"; // Using ES6 import
+import mongoose from "mongoose"; 
 
 const feedbackSchema = new mongoose.Schema(
   {

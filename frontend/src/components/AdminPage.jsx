@@ -50,7 +50,7 @@ const AdminPage = () => {
     fetchCompanies();
   }, []);
 
-  // Fetch flagged feedbacks
+ 
   useEffect(() => {
     if (activeSection === "flaggedFeedbacks") {
       fetchFlaggedFeedbacks();
@@ -58,16 +58,16 @@ const AdminPage = () => {
   }, [activeSection]);
 
   const fetchFlaggedFeedbacks = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/admin/flagged-feedbacks");
+   try {
+      const response = await axios.get("http://localhost:5000/api/viewFeedback/flag");
+      console.log("hi");
+      console.log(response.data);
       setFlaggedFeedbacks(response.data);
     } catch (error) {
       console.error("Error fetching flagged feedbacks:", error);
       toast.error("Error loading flagged feedbacks ❌");
     }
-  };
-
-  const fetchFeedbackDetails = async (feedbackId) => {
+  };const fetchFeedbackDetails = async (feedbackId) => {
     setIsLoadingFeedback(true);
     try {
       console.log("hi");
@@ -80,9 +80,7 @@ const AdminPage = () => {
     } finally {
       setIsLoadingFeedback(false);
     }
-  };
-
-  const handleAddUser = async (e) => {
+  };const handleAddUser = async (e) => {
     e.preventDefault();
     try {
       await axios.post("http://localhost:5000/api/admin/add-user", {
@@ -104,9 +102,7 @@ const AdminPage = () => {
       console.error(error.response?.data || error.message);
       toast.error("Error adding user ❌");
     }
-  };
-
-  const handleAddCompany = async (e) => {
+  };const handleAddCompany = async (e) => {
     e.preventDefault();
     try {
       await axios.post("http://localhost:5000/api/admin/add-company", {
@@ -122,17 +118,12 @@ const AdminPage = () => {
       console.error(error.response?.data || error.message);
       toast.error("Error adding company ❌");
     }
-  };
-
-  const handleBulkUpload = async (type) => {
+  };const handleBulkUpload = async (type) => {
     if (!selectedFile) {
       toast.error("Please select a file first ❗");
       return;
-    }
-
-    const formData = new FormData();
+    }const formData = new FormData();
     formData.append("file", selectedFile);
-
     try {
       await axios.post(`http://localhost:5000/api/admin/bulk-upload/${type}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -146,27 +137,17 @@ const AdminPage = () => {
       console.error("Upload error:", error);
       toast.error(`Error uploading ${type} file ❌`);
     }
-  };
-
-  const handleFileChange = (e) => {
+  };const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
-  };
-
-  const handleFileChange1 = (e) => {
+  };const handleFileChange1 = (e) => {
     setFile(e.target.files[0]);
-  };
-
-  const handleCompanyChange = (event) => {
+  };const handleCompanyChange = (event) => {
     setSelectedCompany(event.target.value);
-  };
-
-  const handleUpload = async () => {
+  };const handleUpload = async () => {
     if (!file || !selectedCompany) {
       toast.error("Please select a company and upload an Excel file.");
       return;
-    }
-
-    const reader = new FileReader();
+    }const reader = new FileReader();
     reader.readAsBinaryString(file);
     reader.onload = async (e) => {
       const binaryStr = e.target.result;
@@ -174,14 +155,11 @@ const AdminPage = () => {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(sheet);
-
       try {
         const response = await axios.post("http://localhost:5000/api/attendees/upload-attendees", {
           companyId: selectedCompany,
           attendees: data,
-        });
-
-        if (response.status === 201) {
+        });if (response.status === 201) {
           toast.success("Attendees uploaded successfully!");
           setFile(null);
           setSelectedCompany("");
@@ -191,9 +169,7 @@ const AdminPage = () => {
         toast.error("Failed to upload attendees.");
       }
     };
-  };
-
-  return (
+  };return (
     <div className="admin-container">
       <aside className="sidebar">
         <button onClick={() => setActiveSection("dashboard")}>Dashboard</button>
@@ -257,70 +233,43 @@ const AdminPage = () => {
         {activeSection === "flaggedFeedbacks" && (
           <div className="flagged-feedbacks-container">
             <h2>Flagged Feedbacks</h2>
-            {flaggedFeedbacks.length === 0 ? (
-              <p>No flagged feedbacks found</p>
-            ) : (
-              <div className="feedback-list-container">
-                <ul className="feedback-list">
-                  {flaggedFeedbacks.map((feedback) => (
-                    <li 
-                      key={feedback.feedbackId} 
-                      className={`feedback-item ${selectedFeedback === feedback.feedbackId ? 'active' : ''}`}
-                      onClick={() => fetchFeedbackDetails(feedback.feedbackId)}
-                    >
-                      <div className="feedback-header">
-                        <span className="feedback-id">Feedback ID: {feedback.feedbackId}</span>
-                        <span className="user-id">User ID: {feedback.userId}</span>
-                      </div>
-                      <FaEdit 
-                        className="edit-icon" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/feedback/${feedback.feedbackId}`);
-                        }} 
-                      />
-                    </li>
-                  ))}
-                </ul>
-                
-                {selectedFeedback && (
-                  <div className="feedback-details">
-                    {isLoadingFeedback ? (
-                      <p>Loading feedback details...</p>
-                    ) : feedbackDetails ? (
-                      <>
-                        <h3>Feedback Details</h3>
-                        <div className="detail-item">
-                          <strong>Company:</strong> {feedbackDetails.companyId?.name || 'N/A'}
-                        </div>
-                        <div className="detail-item">
-                          <strong>User:</strong> {feedbackDetails.userId?.name || feedbackDetails.userId || 'N/A'}
-                        </div>
-                        <div className="detail-item">
-                          <strong>Rating:</strong> {feedbackDetails.rating || 'N/A'}
-                        </div>
-                        <div className="detail-item">
-                          <strong>Comments:</strong> 
-                          <p>{feedbackDetails.comments || 'No comments provided'}</p>
-                        </div>
-                        <div className="detail-item">
-                          <strong>Created At:</strong> 
-                          {new Date(feedbackDetails.createdAt).toLocaleString()}
-                        </div>
-                        <div className="detail-item">
-                          <strong>Status:</strong> 
-                          <span className={`status-${feedbackDetails.status || 'pending'}`}>
-                            {feedbackDetails.status || 'pending'}
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <p>No details available for this feedback</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+
+            {flaggedFeedbacks.length > 0 ? (
+                            <ul className="flaged-list">
+                                {flaggedFeedbacks.map((feedback) => (
+                                     
+                                    <div key={feedback._id} className="feedback-card">
+                                          <p className="user-name">{feedback.
+createdAt}</p>
+                                                <div className="feedback-header">
+
+                                                  
+                                                  <div className="user-info">
+                                                    <p className="user-name">{feedback.name}</p>
+                                                   
+                                                    <p className="user-details">
+                                                      {feedback.rollNumber} | {feedback.department}
+                                                    </p>
+                                                  </div>
+                                                </div>
+                                    
+                                                <div className="company-info">
+                                                  <p><strong>🏢 Company:</strong> {feedback.companyName}</p>
+                                                  <p><strong>📍 Location:</strong> {feedback.companyLocation}</p>
+                                                </div>
+                                    
+                                               
+                                                <button onClick={() => navigate(`/feedback/${feedback._id}`)} className="view-feedback-btn">
+                                                  View Full Feedback →
+                                                </button>
+                                              </div>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="no-saved">No saved feedback</p>
+                        )}
+              
+            
           </div>
         )}
       </main>

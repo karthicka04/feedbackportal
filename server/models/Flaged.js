@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const FlagedSchema = new mongoose.Schema({
-    userId: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "Feedback", required: true },
     feedbackId: { type: mongoose.Schema.Types.ObjectId, ref: "Feedback", required: true },
 }, { timestamps: true });
 
