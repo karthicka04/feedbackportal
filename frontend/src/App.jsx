@@ -17,11 +17,11 @@ import CompanyFeedbackPage from "./components/CompanyFeedbackPage";
 
 
 function App() {
-    useEffect(()=>{
-        window.onbeforeunload=()=>{
-            localStorage.removeItem('currentUser');
-        }
-    },[]);
+    // useEffect(()=>{
+    //     window.onbeforeunload=()=>{
+    //         localStorage.removeItem('currentUser');
+    //     }
+    // },[]);
     return (
         <Router>
             <Navbar />  

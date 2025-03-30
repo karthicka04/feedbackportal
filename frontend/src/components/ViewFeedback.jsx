@@ -42,7 +42,7 @@ const ViewFeedback = ({ companyId }) => {
           }
           throw new Error(`Failed to fetch feedback: ${response.status}`);
         }
-
+        
         const data = await response.json();
         setFeedbacks(data);
         console.log("Fetched feedback data:", data);
@@ -70,7 +70,6 @@ const ViewFeedback = ({ companyId }) => {
       initialBookmarked[feedback._id] = feedback.savedBy?.includes(user._id) || false;
       initialFlagged[feedback._id] = feedback.flaggedBy?.includes(user._id) || false;
     });
-
     setLikedFeedbacks(initialLiked);
     setBookmarkedFeedbacks(initialBookmarked);
     setFlaggedFeedbacks(initialFlagged);

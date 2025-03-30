@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
  const Profile = () => {
      const [user, setUser] = useState(null);
      const [feedbackList, setFeedbackList] = useState([]);
-     const [savedList,setSavedList] = useState([]);
+     const [savedFeedbacks, setSavedFeedbacks] = useState([]);
      const [selectedSection, setSelectedSection] = useState('profile');
      const [editMode, setEditMode] = useState(false);
      const [profileData, setProfileData] = useState({}); 
@@ -38,6 +38,26 @@ import React, { useState, useEffect } from 'react';
 
          fetchUserFeedback();
      }, []);
+
+    useEffect(() => {
+  if (user) {
+    const fetchSavedFeedbacks = async () => {
+      try {
+        //console.log("hi");
+        const response = await axios.get(`/api/viewFeedback/bookmark?userId=${user._id}`);
+        // console.log(response.data); 
+        // console.log("Saved Feedbacks:", response.data);
+        // console.log("Type of response:", typeof response.data);
+        setSavedFeedbacks(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching saved feedbacks:", error);
+      }
+    };
+
+    fetchSavedFeedbacks();
+  }
+}, [user]);  // Run only when `user` is set
+
 
      if (!user) return <div>Loading...</div>;
 
@@ -89,14 +109,13 @@ import React, { useState, useEffect } from 'react';
       } catch (error) {
           console.error('Error updating profile:', error);
           if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
-              console.error("Server responded with error:", error.response.data);  // Log the server's error message
+            
+              console.error("Server responded with error:", error.response.data);  
               console.error("Status code:", error.response.status);
-              // Optionally display the error message from the server to the user
+             
               alert(`Update failed: ${error.response.data.error || 'An error occurred'}`);
           } else if (error.request) {
-              // The request was made but no response was received
+            
               console.error("No response received:", error.request);
               alert('Update failed: No response from server.');
           } else {
@@ -148,6 +167,7 @@ import React, { useState, useEffect } from 'react';
             if (response.status === 200) {
                 localStorage.setItem("currentUser", JSON.stringify(response.data.user));
                 setUser(response.data.user);
+                console.log()
                 setEditMode(false);
                 setChangePassword(false);
                 setNewPassword('');
@@ -271,11 +291,31 @@ import React, { useState, useEffect } from 'react';
                  );
                  case 'saved':
                     return (
-                        <div className="feedback-section">
-                            <h3>Your Saved:</h3>
-                            
-                        </div>
-                    );
+    <div className="feedback-section">
+      <h3>Your Saved Feedbacks:</h3>
+      {savedFeedbacks.length > 0 ? (
+        <ul className="saved-list">
+          {savedFeedbacks.map((feedback) => (
+            <li key={feedback._id}>
+              <div className="feedback-text">
+                <h4>{feedback.companyName}</h4>
+                <p><strong>Role:</strong> {feedback.role}</p>
+                <p><strong>Location:</strong> {feedback.companyLocation}</p>
+                <p><strong>Placement Type:</strong> {feedback.placementType}</p>
+                <p><strong>Preparation Time:</strong> {feedback.preparationTime}</p>
+                <p><strong>Skills Used:</strong> {feedback.skillsUsed}</p>
+                <p><strong>Additional Details:</strong> {feedback.additionalDetails}</p>
+                <p><strong>Tips:</strong> {feedback.tips}</p>
+                <p><strong>Interview Rounds:</strong> {feedback.totalRounds}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="no-saved">No saved feedback</p>
+      )}
+    </div>
+  );
              case 'notifications':
                  return (
                      <div>
